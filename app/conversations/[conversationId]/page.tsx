@@ -1,6 +1,9 @@
 import { getConversationById } from "@/actions/getConversationById";
 import { getMessages } from "@/actions/getMessages";
 import EmptyState from "@/components/EmptyState";
+import Header from "./_components/Header";
+import Body from "./_components/Body";
+import Form from "./_components/Form";
 
 interface IParams {
   conversationId: string;
@@ -22,7 +25,11 @@ const ConversationIdPage = async ({ params }: { params: IParams }) => {
 
   return (
     <div className="lg:pl-80 h-full">
-      <div className="h-full flex flex-col">Conversation Id</div>
+      <div className="h-full flex flex-col">
+        <Header conversation={conversation} />
+        <Body />
+        <Form />
+      </div>
     </div>
   );
 };
