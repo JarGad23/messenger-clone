@@ -50,7 +50,7 @@ const ConversationBox = ({ data, selected }: ConversationBoxProps) => {
     }
 
     if (lastMessage?.body) {
-      return lastMessage.body;
+      return lastMessage?.body;
     }
 
     return "Started a conversation";
