@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/actions/getCurrentUser";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import { pusherServer } from "@/lib/pusher";
 
 interface IParams {
   conversationId: string;
@@ -53,7 +54,25 @@ export async function POST(req: Request, { params }: { params: IParams }) {
       },
     });
 
-    return NextResponse.json(updatedMessage);
+    // Update all connections with new seen
+    await pusherServer.trigger(currentUser.email, "conversation:update", {
+      id: conversationId,
+      messages: [updatedMessage],
+    });
+
+    // If user has already seen the message, no need to go further
+    if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
+      return NextResponse.json(conversation);
+    }
+
+    // Update last message seen
+    await pusherServer.trigger(
+      conversationId!,
+      "message:update",
+      updatedMessage
+    );
+
+    return new NextResponse("Success");
   } catch (error) {
     console.log("[CONVERSATION_ID_SEEN]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
