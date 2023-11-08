@@ -66,11 +66,21 @@ const ConversationList = ({ initialItems, users }: ConversationListProps) => {
       setItems((current) => {
         return [...current.filter((convo) => convo.id !== conversation.id)];
       });
+      if (conversation.id === conversation.id) {
+        router.push("/conversations");
+      }
     };
 
-    pusherClient.bind("conversation:update", updateHandler);
     pusherClient.bind("conversation:new", newHandler);
+    pusherClient.bind("conversation:update", updateHandler);
     pusherClient.bind("conversation:remove", removeHandler);
+
+    return () => {
+      pusherClient.unsubscribe(pusherKey);
+      pusherClient.unbind("conversation:new", newHandler);
+      pusherClient.unbind("conversation:update", updateHandler);
+      pusherClient.unbind("conversation:remove", removeHandler);
+    };
   }, [pusherKey, router]);
 
   return (
